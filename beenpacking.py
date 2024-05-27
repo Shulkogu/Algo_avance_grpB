@@ -1,5 +1,6 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
 import random
-from typing import List
 
 class Colis:
     def __init__(self, identifiant: int, largeur: int, hauteur: int, profondeur: int):
@@ -27,7 +28,7 @@ class Camion:
             self.colis.append(colis)
             self.volume_occupe += colis.volume
 
-def simuler_bin_packing(colis: List[Colis], camions: List[Camion]):
+def simuler_bin_packing(colis, camions):
     for c in colis:
         for camion in camions:
             if camion.peut_ajouter_colis(c):
@@ -35,39 +36,83 @@ def simuler_bin_packing(colis: List[Colis], camions: List[Camion]):
                 break
     return camions
 
-def afficher_resultats(camions: List[Camion]):
+def afficher_resultats(camions):
+    result_window = tk.Toplevel()
+    result_window.title("Résultats de la Simulation")
+    result_window.geometry("600x400")
+
     for camion in camions:
-        print(f"Camion {camion.id}:")
-        print(f"  Volume maximum: {camion.volume_max} m³")
-        print(f"  Volume occupé: {camion.volume_occupe} m³")
-        print(f"  Colis:")
+        camion_frame = ttk.LabelFrame(result_window, text=f"Camion {camion.id}")
+        camion_frame.pack(fill="x", padx=5, pady=5)
+
+        details = f"Volume maximum: {camion.volume_max} m³\nVolume occupé: {camion.volume_occupe} m³\nColis:\n"
         for colis in camion.colis:
-            print(f"    Colis {colis.id} (Volume: {colis.volume} m³)")
-        print()
+            details += f"  Colis {colis.id} (Volume: {colis.volume} m³)\n"
+        
+        label = ttk.Label(camion_frame, text=details)
+        label.pack()
 
 def main():
-    # Saisir le nombre de camions et de colis
-    num_camions = int(input("Entrez le nombre de camions: "))
+    def start_simulation():
+        try:
+            num_camions = int(entry_num_camions.get())
+            num_colis = int(entry_num_colis.get())
 
-    camions = []
-    for i in range(num_camions):
-        capacite_camion = input(f"Entrez la capacité du camion {i+1} (L, H, P) en mètres: ")
-        capacite_largeur, capacite_hauteur, capacite_profondeur = map(int, capacite_camion.split(','))
-        camions.append(Camion(i+1, capacite_largeur, capacite_hauteur, capacite_profondeur))
+            camions = []
+            for i in range(num_camions):
+                capacite_camion = entry_capacites[i].get()
+                capacite_largeur, capacite_hauteur, capacite_profondeur = map(int, capacite_camion.split(','))
+                camions.append(Camion(i+1, capacite_largeur, capacite_hauteur, capacite_profondeur))
 
-    num_colis = int(input("Entrez le nombre de colis: "))
+            random.seed(42)
+            colis = [Colis(i, random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)) for i in range(num_colis)]
 
-    # Générer des colis aléatoires
-    random.seed(42)
-    colis = [Colis(i, random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)) for i in range(num_colis)]
+            camions = simuler_bin_packing(colis, camions)
+            afficher_resultats(camions)
+        except ValueError:
+            messagebox.showerror("Erreur de saisie", "Veuillez entrer des valeurs valides.")
 
-    # Simuler le bin packing
-    camions = simuler_bin_packing(colis, camions)
+    root = tk.Tk()
+    root.title("Simulation de Bin Packing")
+    root.geometry("400x400")
 
-    # Afficher les résultats
-    afficher_resultats(camions)
+    main_frame = ttk.Frame(root, padding="10")
+    main_frame.pack(fill="both", expand=True)
+
+    label_num_camions = ttk.Label(main_frame, text="Nombre de camions:")
+    label_num_camions.grid(column=0, row=0, sticky="W")
+    entry_num_camions = ttk.Entry(main_frame)
+    entry_num_camions.grid(column=1, row=0, sticky="EW")
+
+    label_num_colis = ttk.Label(main_frame, text="Nombre de colis:")
+    label_num_colis.grid(column=0, row=1, sticky="W")
+    entry_num_colis = ttk.Entry(main_frame)
+    entry_num_colis.grid(column=1, row=1, sticky="EW")
+
+    entry_capacites = []
+
+    def generate_camion_entries():
+        for widget in camion_frame.winfo_children():
+            widget.destroy()
+
+        num_camions = int(entry_num_camions.get())
+        for i in range(num_camions):
+            label_capacite = ttk.Label(camion_frame, text=f"Capacité du camion {i+1} (L, H, P):")
+            label_capacite.grid(column=0, row=i, sticky="W")
+            entry_capacite = ttk.Entry(camion_frame)
+            entry_capacite.grid(column=1, row=i, sticky="EW")
+            entry_capacites.append(entry_capacite)
+
+    generate_camion_btn = ttk.Button(main_frame, text="Générer les champs des camions", command=generate_camion_entries)
+    generate_camion_btn.grid(column=0, row=2, columnspan=2, pady=5)
+
+    camion_frame = ttk.Frame(main_frame)
+    camion_frame.grid(column=0, row=3, columnspan=2, pady=5)
+
+    start_btn = ttk.Button(main_frame, text="Démarrer la simulation", command=start_simulation)
+    start_btn.grid(column=0, row=4, columnspan=2, pady=10)
+
+    root.mainloop()
 
 if __name__ == "__main__":
     main()
-message.txt
-3 Ko
