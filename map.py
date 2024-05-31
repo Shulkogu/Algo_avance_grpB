@@ -8,10 +8,11 @@ def read_csv(file):
         csv_reader = csv.DictReader(file)
         cities_dict = {}
         for row in csv_reader:
-            cities_dict[row["ville_nom_reel"]] = {
-                "ville_latitude_deg": row["ville_latitude_deg"],
-                "ville_longitude_deg": row["ville_longitude_deg"]
-            }
+            if int(row["ville_departement"]) < 96:
+                cities_dict[row["ville_nom_reel"]] = {
+                    "ville_latitude_deg": row["ville_latitude_deg"],
+                    "ville_longitude_deg": row["ville_longitude_deg"]
+                }
         return cities_dict
 
 
