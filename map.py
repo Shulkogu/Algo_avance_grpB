@@ -50,7 +50,7 @@ def generate_coordinates(cities, trucks):
 
 
 def generate_map(coords):
-    client = ors.Client(base_url='http://10.54.128.130:8082/ors')
+    client = ors.Client(base_url='http://85.95.212.63:8082/ors')
     m = folium.Map(location=[46.603354, 1.888334], zoom_start=6)
     colors = ['blue', 'red', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige', 'darkblue', 'darkgreen']
     for i, coord in enumerate(coords):
